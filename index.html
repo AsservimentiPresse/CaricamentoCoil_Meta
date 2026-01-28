@@ -1,3 +1,8 @@
+
+Alex Stanila <stanila.alexandru.d@gmail.com>
+10:12 (3 minuti fa)
+a me
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -45,6 +50,14 @@ background: #444;
 color: white;
 }
 
+/* Dropdown animazioni */
+#animSelect {
+padding: 10px;
+font-size: 1rem;
+border-radius: 10px;
+margin-bottom: 10px;
+}
+
 /* Contenitore sezioni */
 .controls-section {
 display: flex;
@@ -88,7 +101,7 @@ min-width: 80px;
 
 <!-- MODEL VIEWER -->
 <model-viewer id="viewer"
-src="linea lunga_V3.glb"
+src="AP6250E_v1.glb"
 ar
 ar-modes="webxr scene-viewer quick-look"
 camera-controls
@@ -97,6 +110,11 @@ shadow-intensity="0"
 exposure="0.5"
 alt="ASSIEME 3D Model">
 </model-viewer>
+
+<!-- SELECT ANIMAZIONE -->
+<select id="animSelect" onchange="selectAnimation()">
+<option disabled selected>Seleziona animazione</option>
+</select>
 
 <!-- PLAY / PAUSE -->
 <button id="animBtn" onclick="toggleAnimation()">
@@ -133,7 +151,25 @@ alt="ASSIEME 3D Model">
 <script>
 const modelViewer = document.querySelector('#viewer');
 const animBtn = document.getElementById('animBtn');
+const animSelect = document.getElementById('animSelect');
 
+/* Carica animazioni */
+modelViewer.addEventListener('load', () => {
+const animations = modelViewer.availableAnimations;
+
+animations.forEach(anim => {
+const option = document.createElement('option');
+option.value = anim;
+option.textContent = anim;
+animSelect.appendChild(option);
+});
+
+if (animations.length > 0) {
+modelViewer.animationName = animations[0];
+}
+});
+
+/* Play / Pause */
 function toggleAnimation() {
 if (modelViewer.paused) {
 modelViewer.play();
@@ -144,7 +180,16 @@ animBtn.textContent = "▶ Play animation";
 }
 }
 
-async function changeColor(materialIndex, rgba) {
+/* Cambio animazione */
+function selectAnimation() {
+modelViewer.pause();
+modelViewer.animationName = animSelect.value;
+modelViewer.play();
+animBtn.textContent = "⏸ Pause animation";
+}
+
+/* Cambio colore materiali */
+function changeColor(materialIndex, rgba) {
 const material = modelViewer.model.materials[materialIndex];
 if (material && material.pbrMetallicRoughness) {
 material.pbrMetallicRoughness.setBaseColorFactor(rgba);
